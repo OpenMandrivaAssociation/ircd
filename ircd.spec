@@ -21,6 +21,7 @@ Source0:	ftp://ftp.irc.org/irc/server/%{distname}.tar.bz2
 Source1:	ircd.init
 Source2:	README.urpmi
 Source3:	ircd_crypter
+BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	zlib-devel
 Requires(pre):	rpm-helper
 Requires(post):	rpm-helper
