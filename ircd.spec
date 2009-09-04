@@ -6,7 +6,7 @@
   %define rel p%{patchlevel}.1
 %else
   %define distname %{name}%{version}
-%define rel 1
+%define rel 2
 %endif
 %define release %mkrel %{rel}
 
