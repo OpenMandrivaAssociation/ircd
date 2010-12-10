@@ -3,10 +3,10 @@
 %define patchlevel 1
 %if %patchlevel
   %define distname irc%{version}p%{patchlevel}
-  %define rel p%{patchlevel}.1
+  %define rel p%{patchlevel}.2
 %else
   %define distname %{name}%{version}
-%define rel 2
+%define rel 3
 %endif
 %define release %mkrel %{rel}
 
