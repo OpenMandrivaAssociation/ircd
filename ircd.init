@@ -1,0 +1,51 @@
+#! /bin/sh
+#
+### BEGIN INIT INFO
+# Provides: ircd
+# Required-Start: $network
+# Required-Stop: $network
+# Default-Start: 3 5
+# Short-Description: IRC server
+# Description: The IRC daemon runs an IRC server for use with Internet
+#               Relay Chat clients.
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Get config.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+if [ ${NETWORKING} = "no" ]
+then
+	exit 0
+fi
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Starting IRC system: "
+	daemon /usr/sbin/ircd
+	echo
+	touch /var/lock/subsys/ircd
+	;;
+  stop)
+	echo -n "Stopping IRC service: "
+	killproc ircd
+	echo
+	rm -f /var/lock/subsys/ircd
+	;;
+  status)
+	status ircd
+	;;
+  restart)
+	$0 stop
+	$0 start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|status|restart}"
+	exit 1
+esac
+
+exit 0

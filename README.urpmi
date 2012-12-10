@@ -1,0 +1,8 @@
+ircd 2.11.1-p1 update notes
+
+Major changes in /etc/ircd/ircd.conf:
+- M: has a new mandatory field: SID, for example 000A
+- I: requires now both name field and addr field to match,
+  but if <TARGET Hosts NAME> is not empty (even if "*"), the client is
+  required to have DNS
+  "I:*::::::" will allow any client to connect

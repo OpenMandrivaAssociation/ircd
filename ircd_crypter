@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+############################################################################
+# Last revision: 26.03.1999
+##########################  DESCRIPTION  ###################################
+# IRCD.conf password crypter.
+#
+# Based on 'ircd/crypt/crypter', Copyright (C) 1991 Sean Batt
+# Just made a cleaner&safer code for the sake of the lamers.
+############################################################################
+
+############################################################################
+# Copyright 1999 by AltBlue [IRL: Marius Feraru]                           #
+# All rights reserved                                                      #
+#                                                                          #
+# Distribute freely, except:                                               #
+# * don't remove my name from the source or documentation                  #
+#    (don't take credit for my work)                                       #
+# * mark your changes                                                      #
+#    (don't get me blamed for your possible bugs)                          #
+# * don't alter or remove this notice.                                     #
+#                                                                          #
+# May be sold if buildable source is provided to buyer.                    #
+# No warrantee of any kind, express or implied, is included with this sw.  #
+# Use at your own risk, responsibility for damages (if any) to anyone      #
+# resulting from the use of this software rests entirely with the user.    #
+#                                                                          #
+# Send bug reports, bug fixes, enhancements, requests, flames etc., and    #
+# I'll try to keep a version up to date.                                   #
+#                                                                          #
+# I can be reached as follows:                                             #
+#  E-Mail:   AltBlue <altblue@tuiasi.ro>                                   #
+# Homepage: http://www.cs.tuiasi.ro/altblue/                               #
+############################################################################
+
+$ircdconf = $verbose = $Ntoo = 0;
+
+while (@ARGV) {
+	$i = shift(@ARGV);
+	if ($i eq '-v') {
+		$verbose++;
+		next;
+	}
+	if ($i eq '-h') {
+		&usage();
+		exit 1;
+	}
+	if ($i eq '-N') {
+		$Ntoo++;
+		next;
+	}
+	# Cannot specify more than one conf file!
+	if ($ircdconf) {
+		&usage();
+		exit 1;
+	}
+	$ircdconf = $i;
+}
+
+
+unless($ircdconf && -f $ircdconf && -W $ircdconf) {
+	&usage();
+	exit 1;
+}
+
+@saltset = ('a' .. 'z', 'A' .. 'Z', '0' .. '9', '.', '/');
+
+verbose("crypting $ircdconf\n");
+verbose("N line passwords too!\n") if $Ntoo;
+
+$regexp = $Ntoo ? "^(o|O|N)" : "^(o|O)";
+
+### Read the old config file
+open(CONF,$ircdconf) || die "ERROR opening '$ircdconf' : $!\n";
+@conf = <CONF>;
+close(CONF);
+
+$crypted = 0;
+$cryptedline = '# The next line contains a crypted password';
+### Process the config file
+foreach(@conf) {
+	# Is this line a comment about an already crypted line?
+	if (/^$cryptedline/) {
+		$crypted = 1;
+		next;
+	}
+	#if its not an "o", "O" or "N" line we can ignore it
+	next unless /$regexp/;
+	if ($crypted == 1) {
+		# This was already crypted
+		verbose("Found an already cryted line:\n $_");
+		$crypted = 0;
+		next;
+	}
+	verbose("found an operator line:\n $_");
+	@parts = split(/:/);
+	unless($#parts == 5) {
+		verbose("HEY! This line isn't right. skipping.\n");
+		next;
+	}
+	$salt = $saltset[rand(time)%64].$saltset[(rand(time)>>6)%64];
+	$parts[2] = crypt($parts[2], $salt);
+	$_ = $cryptedline . "\n" . join(':',@parts);
+	verbose("ok. line crypted.\n");
+}
+
+### Make a backup file
+if(rename($ircdconf, $ircdconf.'-backup')) {
+	verbose("$ircdconf backup: $ircdconf-backup\n");
+} else {
+	verbose("hmm... couldn't make a backup file for $ircdconf.\n");
+}
+
+### Write the new crypted gysmo file
+open(CONF,">$ircdconf") || die "ERROR opening '$ircdconf' : $!\n";
+	$lockerror = &lockfile(CONF);
+	if ($lockerror) {
+		verbose("holly molly! i just can't lock $ircdconf :(( \n");
+		exit 1;
+	}
+	print CONF @conf;
+	&unlockfile(CONF);
+close(CONF);
+
+verbose("Job done.\n");
+
+#=========================================================================
+# usage usage();
+#=========
+sub usage
+{
+	print <<USAGE;
+ERROR: ircd.conf not found or not writeable.
+
+	Usage: $0 <ircd.conf-file> [-h -v -N]
+
+		-h	this help screen
+		-v	verbose
+		-N	crypt passwords on N lines too
+
+USAGE
+}
+
+#=========================================================================
+# usage lockfile(<file>); 
+#=========
+sub lockfile {
+	local(*FILE) = @_;
+	local $try = 10;
+	while ($try--) {
+	    $lockresult = eval("flock(FILE,6)");
+	    if (!$lockresult) {
+		select(undef,undef,undef,0.1);
+	    } else {
+		last;
+	    }
+	}
+	return ($try >= 0) ? 0 : -1 ;
+}
+
+#=========================================================================
+# usage unlockfile(<file>); 
+#=========
+sub unlockfile {
+	local(*FILE) = @_;
+	flock(FILE,8);
+}
+
+#=========================================================================
+# usage verbose(<stream>); 
+#=========
+sub verbose {
+	print @_ if $verbose;
+}

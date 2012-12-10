@@ -100,3 +100,41 @@ rm -rf $RPM_BUILD_ROOT
 %{_initrddir}/%{name}
 
 
+
+
+%changelog
+* Fri Dec 10 2010 Oden Eriksson <oeriksson@mandriva.com> 2.11.1-p1.2mdv2011.0
++ Revision: 619683
+- the mass rebuild of 2010.0 packages
+
+* Fri Sep 04 2009 Thierry Vignaud <tv@mandriva.org> 2.11.1-p1.1mdv2010.0
++ Revision: 429551
+- rebuild
+
+* Wed Jan 02 2008 Olivier Blin <oblin@mandriva.com> 2.11.1-p1.1mdv2008.1
++ Revision: 140792
+- restore BuildRoot
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - kill re-definition of %%buildroot on Pixel's request
+
+
+* Sun Jan 21 2007 Olivier Blin <oblin@mandriva.com> 2.11.1-p1.1mdv2007.0
++ Revision: 111318
+- package ISO-3166-1 country code doc
+- add update notes
+- use rpm-helper service macros
+- 2.11.1-p1 (and drop custom config.h)
+- remove useless check in initscript
+- use LSB header in init script
+- Import ircd
+
+* Thu May 12 2005 Lenny Cartier <lenny@mandrakesoft.com> 2.10.3-12mdk
+- rebuild
+
+* Fri Mar 26 2004 Lenny Cartier <lenny@mandrakesoft.com> 2.10.3-11mdk
+- rebuild
+
+* Mon Feb 23 2004 Lenny Cartier <lenny@mandrakesoft.com> 2.10.3-10mdk
+- rebuild
+
