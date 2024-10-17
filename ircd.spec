@@ -16,7 +16,7 @@ Version:	%{version}
 Release:	%{release}
 License:	GPL
 Group:		Networking/IRC
-URl: 		http://www.irc.org/
+URl: 		https://www.irc.org/
 Source0:	ftp://ftp.irc.org/irc/server/%{distname}.tar.bz2
 Source1:	ircd.init
 Source2:	README.urpmi
